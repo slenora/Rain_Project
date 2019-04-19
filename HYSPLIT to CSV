@@ -1,0 +1,48 @@
+%% This is code to make HYSPLIT files into CSV files. The first part of this code involves getting rid of the top section of initial parameters. 
+%Then it save the files a csv file in what ever directory you say.
+
+% Authour - slenora@siu.edu
+
+clear
+clc
+
+files = dir('PRECIP*');  % Your mini directory. Easily acess directory
+
+
+for p = 1:length(files) % it will loop through the entire amount of files
+    p  % This is a counter, will show up on screen and tell you what iteration you are on
+    tic % This is a time counter and tells you how long a code btook from tic to toc
+    fid = fopen(files(p).name,'r'); % this will open the file at p iteration to read, 'r'
+    trip = 0;
+    count = 1;
+    
+    % the next part of the code is going to get rid of the header
+    % information in each file and will save only the relavant numeric data
+    % as a .csv file
+    
+    while ~feof(fid)
+        curr = fgetl(fid);
+        if trip == 1
+            data(count,:) = str2num(curr);
+            count = count + 1;
+        end
+        
+        if length(curr) >= 15
+            if strcmp(curr(6:15),'1 PRESSURE') == 1
+                trip = 1;
+            end
+        end
+        
+        clear curr
+    end
+        
+    title = ['H:\Files\New Stuff\' files(p).name '.csv']; % you have to change the directory you want to save your new csv files to
+    
+    csvwrite(title,data); % This will create a .csv file for your new file, data
+   
+    fclose(fid); % you have to close what you open
+    clear fid trip count title data % before the end of each iteration you have to clear variables that you are going to make with each new iteration
+    clc % clear workspace
+    toc % This is toc for you tic. 
+end
+    
